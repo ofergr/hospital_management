@@ -20,4 +20,6 @@ void printDoctorList();
 
 void freeDoctorList();
 
+void saveDoctorList();
+
 #endif

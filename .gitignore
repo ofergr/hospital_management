@@ -1,5 +1,7 @@
+hm/*
 x64/*
 x86/*
 Debug/*
 Release/*
 .vs/
+*.tlog

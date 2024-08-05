@@ -30,4 +30,8 @@ void removePatientFromTree(pInTree**, const char*);
 
 void clearAllPatients(pInTree* );
 
+void savePatientQueue();
+
+char *convertAllergyBitToString(char allergy);
+
 #endif

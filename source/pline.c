@@ -37,17 +37,12 @@ void displayPatients() {
     printf("\n");
 }
 
-void freePatientsQueue() {
+void freePatientsLine() {
     pInLine *p = patients_line;
     while (p != NULL) {
         p = p->next;
         if (patients_line->lpatient)
         {
-            free(patients_line->lpatient->Name);
-            patients_line->lpatient->Name = NULL;
-            free(patients_line->lpatient->ID);
-            patients_line->lpatient->ID = NULL;
-            free(patients_line->lpatient);
             patients_line->lpatient = NULL;
         }
         free(patients_line);
@@ -84,11 +79,29 @@ void clearAllPatientsInLine(pInLine** head) {
     pInLine* next;
     while (current != NULL) {
         next = current->next;
-        /*free(current->lpatient->Name);
-        free(current->lpatient->ID);
-        free(current->lpatient);*/
         free(current);
         current = next;
     }
     *head = NULL;
+}
+
+void savePatientLine()
+{
+    FILE *patients_line_file = NULL;
+    pInLine *p = patients_line;
+    int cntr = 1;
+    patients_line_file = fopen(PATIENTS_LINE_TXT_FILE_PATH, "w");
+    if (patients_line_file == NULL)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(patients_line_file, "Patients' IDs in line\n");
+    fprintf(patients_line_file, "=====================\n");
+    while (p != NULL) {
+        fprintf(patients_line_file, "%d.%s\n", cntr, p->lpatient->ID);
+        p = p->next;
+        cntr++;
+    }
+    fclose(patients_line_file);
 }

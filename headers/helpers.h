@@ -15,7 +15,7 @@ void analyzeDoctorsLine(char buffer[MAX_LINE_LENGTH]);
 void loadPatients();
 void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file);
 
-void loadPatientsQueue();
+void loadPatientsLine();
 
 char extractAllergies(char *allergies);
 
@@ -29,7 +29,7 @@ void printMenu();
 
 Doc* findAvailableDoc();
 
-char getallergiesFromUser();
+char getAllergiesFromUser();
 
 Doc* assignDoctor2Case();
 

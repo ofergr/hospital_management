@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 
     loadDoctors();
     loadPatients();
-    loadPatientsQueue();
+    loadPatientsLine();
 
     do {
         printMenu();
@@ -131,6 +131,6 @@ int main(int argc, char **argv) {
 void exitProgram()
 {
     saveDoctorList();
-    savePatientLine();
     savePatientQueue();
+    savePatientLine();
 }

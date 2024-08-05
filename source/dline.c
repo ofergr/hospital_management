@@ -1,3 +1,4 @@
+#include "../headers/constants.h"
 #include "../headers/pline.h"
 #include "../headers/doctor.h"
 #include "../headers/dline.h"
@@ -63,4 +64,27 @@ void freeDoctorList() {
         doctors_list_head = p;
     }
     doctors_list_head = NULL;
+}
+
+void saveDoctorList()
+{
+    FILE *doctors_file = NULL;
+    doctors_list *pList = doctors_list_head;
+    doctors_file = fopen(DOCTORS_TXT_FILE_PATH, "w");
+
+    if (doctors_file == NULL)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(doctors_file , "Full Name; License Number; Number of Patients\n");
+    fprintf(doctors_file, "=============================================\n");
+
+    while (pList != NULL)
+    {
+        fprintf(doctors_file, "%s;%s;%d\n", pList->ldoctor->Name, pList->ldoctor->nLicense, pList->ldoctor->nPatients);
+        pList = pList->next;
+    }
+    fclose(doctors_file);
 }

@@ -154,7 +154,7 @@ void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file) {
     }
 }
 
-void loadPatientsQueue()
+void loadPatientsLine()
 {
     FILE *patients_line_file = NULL;
     patients_line_file = fopen(PATIENTS_LINE_TXT_FILE_PATH, "r");
@@ -220,7 +220,7 @@ Doc* assignDoctor2Case()
     return NULL;
 }
 
-char getallergiesFromUser() {
+char getAllergiesFromUser() {
     char allergy[MAX_LINE_LENGTH] = { 0 };
     char yesNo[MAX_LINE_LENGTH] = { 0 };
     char allergies = 0x0;
@@ -361,6 +361,7 @@ void printPatientAllergies(Patient *patient) {
     }
     printf("\n\n\n");
 }
+
 void getDateFromUser(Date *date) {
     char str[MAX_LINE_LENGTH] = { 0 };
     int valid = 0, num;

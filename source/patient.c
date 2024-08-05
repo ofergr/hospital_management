@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "../headers/constants.h"
 #include "../headers/date.h"
 #include "../headers/ptree.h"
@@ -52,7 +54,7 @@ void admitNewPatient(pInTree *patients_tree) {
         // get patient details
         printf("Please enter your name: \n");
         fgets(patient_name, MAX_LINE_LENGTH, stdin);
-        allergies = getallergiesFromUser();
+        allergies = getAllergiesFromUser();
 
         // after collecting patient details, create it and add it to the DB
         patient = createPatient(patient_name, patient_id, allergies, 1);
@@ -267,4 +269,147 @@ void clearAllPatients(pInTree* root){
     free(root->Patient->ID);
     free(root->Patient);
     free(root);
+}
+
+static int checkNumOfAllergies(char allergies)
+{
+    int cntr = 0;
+    while (allergies)
+    {
+        if ((allergies & 0x1) == 0x1)
+        {
+            cntr++;
+        }
+        allergies = allergies >> 1;
+    }
+    return cntr;
+}
+
+static void saveAllergies(FILE *file, char patientAllergies)
+{
+    int maxAllergies = checkNumOfAllergies(patientAllergies);
+    int allergiesCntr = 0;
+    char allergies;
+
+    if (patientAllergies == NONE)
+        fprintf(file, "none");
+    else
+    {
+        // go over each allergy, and see if the patient has it, by bitwise-and it with its allergies (patientAllergies)
+        allergies = PENICILLIN;
+        while (allergies <= (allergies & PRESERVATIVES))
+        {
+            if (patientAllergies & allergies)
+            {
+                if (allergiesCntr < maxAllergies)
+                {
+                    fprintf(file, "%s,", convertAllergyBitToString(allergies));
+                }
+                else
+                {
+                    // this is the last one, no comma needed
+                    fprintf(file, "%s", convertAllergyBitToString(allergies));
+                }
+            }
+            allergies <<= 1;
+        }
+    }
+    fprintf(file, "\n");
+}
+
+void savePatientQueue() {
+    FILE *patients_file = NULL;
+    StackVisits auxStack;
+    int cntr = 1;
+
+    patients_file = fopen(PATIENTS_TXT_FILE_PATH, "r");
+    if (patients_file == NULL)
+    {
+        perror("Error opening patients file");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(patients_file, "Name; ID; Allergies\n");
+    fprintf(patients_file, "===================\n");
+
+    // we need to save the list of visits, from latest to earliest, so we will use an auxilary stack
+    // to reverse the order of the visits stored in the patient's stack. Then, we will save the visit details
+    // and push the visit back to the original stack.
+    pInLine *p = patients_line;
+    while (p != NULL) {
+        while (p->lpatient->visits->head != NULL) {
+            Visit* visit = pop(p->lpatient->visits);
+            push(&auxStack, visit);
+        }
+
+        // save name and ID
+        fprintf(patients_file, "%d.%s;%s;", cntr, p->lpatient->Name, p->lpatient->ID);
+        // save allergies
+        saveAllergies(patients_file, p->lpatient->Allergies);
+        // save visits
+        while (auxStack.head != NULL)
+        {   
+            Visit* visit = pop(&auxStack);
+            fprintf(patients_file, "Arrival:%d/%d/%d %d:%d\n", visit->tArrival.Year, visit->tArrival.Month, visit->tArrival.Day,
+                    visit->tArrival.Hour, visit->tArrival.Min);
+            if (visit->tDismissed.Year != -1)
+            {
+                fprintf(patients_file, "Dismissed:\n");
+                fprintf(patients_file, "Duration:\n");
+            }
+            else
+            {
+                fprintf(patients_file, "Dismissed:%d/%d/%d %d:%d\n", visit->tDismissed.Year, visit->tDismissed.Month, visit->tDismissed.Day,
+                    visit->tDismissed.Hour, visit->tDismissed.Min);
+                fprintf(patients_file, "Duration:%d:%d\n", (int)(visit->Duration) / MINUTES_IN_HOUR,
+                (int)(visit->Duration) % MINUTES_IN_HOUR);
+            }
+
+            // save doctor and summary
+            fprintf(patients_file, "Doctor:%s\n", visit->Doctor->Name);
+            if (visit->vSummary != NULL)
+            {
+                fprintf(patients_file, "Summary:%s\n", visit->vSummary);
+            }
+            else
+            {
+                fprintf(patients_file, "Summary:\n");
+            }
+
+            push(p->lpatient->visits, pop(&auxStack));
+        }
+        fprintf (patients_file, "========================\n");
+
+        // move to next patient
+        p = p->next;
+        cntr++;
+    }
+    fclose(patients_file);
+}
+
+char *convertAllergyBitToString(char allergy)
+{
+    if (allergy & PENICILLIN)
+        return "Penicillin";
+
+    if (allergy & SULFA)
+        return "Sulfa";
+
+    if (allergy & OPIOIDS)
+        return "Opioids";
+
+    if (allergy & ANESTHETICS)
+        return "Anesthetics";
+
+    if (allergy & EGGS)
+        return "Eggs";
+
+    if (allergy & LATEX)
+        return "Latex";
+
+    if (allergy & PRESERVATIVES)
+    {
+        return "Preservatives";
+    }
+    return NULL;
 }

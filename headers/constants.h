@@ -29,7 +29,6 @@
 #define EGGS 0x10
 #define LATEX 0x20
 #define PRESERVATIVES 0x40
-#define ILEGAL_allergIES 0xff
 
 /* error messgaes */
 #define ERROR_NO_DOCTOR_AVAILLEABLE "No doctor available at the moment, Please come later\n"

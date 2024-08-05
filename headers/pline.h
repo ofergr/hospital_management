@@ -18,10 +18,12 @@ void insertPatientToLine(pInLine **head, Patient *patient);
 
 void displayPatients();
 
-void freePatientsQueue();
+void freePatientsLine();
 
 void clearAllPatientsInLine(pInLine** );
 
 void removePatientFromLine(pInLine**, const char* );
+
+void savePatientLine();
 
 #endif
