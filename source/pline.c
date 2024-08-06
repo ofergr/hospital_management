@@ -37,6 +37,24 @@ void displayPatients() {
     printf("\n");
 }
 
+void displayPatientsInLine()
+{
+    pInLine *p = patients_line;
+    Visit *visit = NULL;
+    int i = 1;
+    while (p != NULL)
+    {
+        printf("%d. Name: %s, ID: %s\n", i, p->lpatient->Name, p->lpatient->ID);
+        visit = peek(p->lpatient->visits);
+        printf("addmitted on %d/%d/%d %d:%d\n", visit->tArrival.Day, visit->tArrival.Month,
+               visit->tArrival.Year, visit->tArrival.Hour,
+               visit->tArrival.Min);
+        p = p->next;
+        i++;
+    }
+    printf("\n");
+}
+
 void freePatientsLine() {
     pInLine *p = patients_line;
     while (p != NULL) {
@@ -68,9 +86,6 @@ void removePatientFromLine(pInLine** head, const char* patient_id) {
     else {
         prev->next = temp->next;
     }
-    free(temp->lpatient->Name);
-    free(temp->lpatient->ID);
-    free(temp->lpatient);
     free(temp);
 }
 

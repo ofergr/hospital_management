@@ -21,6 +21,8 @@ Patient *searchPatient(pInTree *patients_tree, char *id);
 
 void displayAllPatients(pInTree *patients_tree);
 
+void displayPatientsInLine();
+
 void freeAllPatients(pInTree *patients_tree);
 
 #endif

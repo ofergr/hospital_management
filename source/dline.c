@@ -36,11 +36,16 @@ Doc *getDoctorByName(const char *name) {
 void printDoctorList() {
     doctors_list *p = doctors_list_head;
     int i = 1;
+
+    printf("Doctors List\n");
+    printf("============\n");
+
     while (p != NULL) {
         printf("%d. Name: %s Patients: %d\n", i, p->ldoctor->Name, p->ldoctor->nPatients);
         p = p->next;
         i++;
     }
+    printf("\n");
 }
 
 void freeDoctorList() {

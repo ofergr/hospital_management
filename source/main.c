@@ -60,11 +60,12 @@ int main(int argc, char **argv) {
             break;
             case DISPLAY_ALL_PATIENTS_ADDMITIONS:
                 displayPatients();
-                DisplayPatientAddmittions();
-                printf("\n\n");
+                getUserId(patient_id);
+                DisplayPatientAddmittions(patient_id);
+                printf("\n");
                 break;
             case DISPLAY_ALL_PATIENTS_IN_LINE:
-                displayPatients();
+                displayPatientsInLine();
                 printf("\n\n");
                 break;
             case ADVANCE_PATIENT_IN_LINE:
@@ -80,6 +81,7 @@ int main(int argc, char **argv) {
                 printf("\n\n");
             break;
             case DISPLAY_ALL_PATIENTS_ASSIGNED_TO_A_DOCTOR:
+                printDoctorList();
                 printf("Please enter Doctor's name: \n");
                 fgets(doctorName, MAX_LINE_LENGTH, stdin);
                 doctorName[strlen(doctorName) - 1] = '\0';
@@ -98,8 +100,9 @@ int main(int argc, char **argv) {
                 getUserId(patient_id);
                 patient = searchPatient(patients_tree, patient_id);
                 if (patient != NULL) {
+                    DisplayPatientAddmittions(patient_id);
                     removeVisit(patient->visits);
-                    DisplayPatientAddmittions();
+                    DisplayPatientAddmittions(patient_id);
                 } else {
                     printf("%s\n", ERROR_PATIENT_NOT_FOUND);
                 }
@@ -107,8 +110,8 @@ int main(int argc, char **argv) {
             case REMOVE_PATIENT:
                 displayPatients();
                 getUserId(patient_id);
-                removePatientFromTree(&patients_tree, patient_id);
                 removePatientFromLine(&patients_line, patient_id);
+                removePatientFromTree(&patients_tree, patient_id);
                 printf("Patient removed successfully.\n");
                 break;
             case CLOSE_THE_HOSPITAL:
@@ -133,4 +136,7 @@ void exitProgram()
     saveDoctorList();
     savePatientQueue();
     savePatientLine();
+    clearAllPatients(patients_tree);
+    clearAllPatientsInLine(&patients_line);
+    freeDoctorList();
 }

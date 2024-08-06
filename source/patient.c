@@ -34,6 +34,7 @@ Patient* createPatient(const char *name, const char *id, char allergies, unsigne
 
     newPatient->Allergies = allergies;
     newPatient->nVisits = nVisits;
+    newPatient->visits = (StackVisits *)calloc(1, sizeof(StackVisits));
     return newPatient;
 }
 
@@ -54,6 +55,7 @@ void admitNewPatient(pInTree *patients_tree) {
         // get patient details
         printf("Please enter your name: \n");
         fgets(patient_name, MAX_LINE_LENGTH, stdin);
+        patient_name[strlen(patient_name) - 1] = '\0';
         allergies = getAllergiesFromUser();
 
         // after collecting patient details, create it and add it to the DB
@@ -151,14 +153,12 @@ void dischargePatient()
         printf("%s\n", ERROR_PATIENT_NOT_FOUND);
 }
 
-void DisplayPatientAddmittions()
+void DisplayPatientAddmittions(char *patient_id)
 {
     Patient *patient = NULL;
     StackVisits auxStack;
-    char patient_id[MAX_LINE_LENGTH] = { 0 };
     int visitCntr = 1;
-
-    getUserId(patient_id);
+    memset(&auxStack, 0, sizeof(StackVisits));
 
     patient = searchPatient(patients_tree, patient_id);
     if (patient != NULL) {
@@ -201,6 +201,9 @@ void removePatientFromTree(pInTree** root, const char* patient_id) {
     if (*root == NULL) return;
     pInTree* current = *root;
     pInTree* parent = NULL;
+    pInTree* p = NULL;
+    pInTree* temp;
+
     while ((current != NULL) && (strcmp(current->Patient->ID, patient_id) != 0)) {
         parent = current;
         if (strcmp(patient_id, current->Patient->ID) < 0) {
@@ -225,27 +228,35 @@ void removePatientFromTree(pInTree** root, const char* patient_id) {
         }
     }
     else {
-        pInTree* p = NULL;
-        pInTree* temp;
-
+        p = current;
         temp = current->right;
-        while (temp->left != NULL) {
+        while (temp->left != NULL)
+        {
             p = temp;
             temp = temp->left;
         }
-        if (p != NULL) {
+
+        // Free current's Patient data
+        free(current->Patient->Name);
+        free(current->Patient->ID);
+        free(current->Patient);
+
+        // Move temp's Patient data to current
+        current->Patient = temp->Patient;
+
+        // Remove temp from the tree
+        if (p != current)
+        {
             p->left = temp->right;
         }
-        else {
-            current->right = temp->right;
+        else
+        {
+            p->right = temp->right;
         }
-        current->Patient = temp->Patient;
-        current = temp;
+
+        // Free temp
+        free(temp);
     }
-    free(current->Patient->Name);
-    free(current->Patient->ID);
-    free(current->Patient);
-    free(current);
 }
 
 
@@ -321,7 +332,7 @@ void savePatientQueue() {
     FILE *patients_file = NULL;
     StackVisits auxStack;
     int cntr = 1;
-
+    memset(&auxStack, 0, sizeof(StackVisits));
     patients_file = fopen(PATIENTS_TXT_FILE_PATH, "r");
     if (patients_file == NULL)
     {
@@ -348,7 +359,7 @@ void savePatientQueue() {
         saveAllergies(patients_file, p->lpatient->Allergies);
         // save visits
         while (auxStack.head != NULL)
-        {   
+        {
             Visit* visit = pop(&auxStack);
             fprintf(patients_file, "Arrival:%d/%d/%d %d:%d\n", visit->tArrival.Year, visit->tArrival.Month, visit->tArrival.Day,
                     visit->tArrival.Hour, visit->tArrival.Min);

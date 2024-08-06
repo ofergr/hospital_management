@@ -19,14 +19,21 @@ Visit* createVisit(Date tArrival, Date tDismissed, float duration, Doc* doctor, 
     visit->tArrival = tArrival;
     visit->tDismissed = tDismissed;
     visit->Duration = duration;
-
-    visit->vSummary = NULL;
+    if (vSummary != NULL)
+    {
+        visit->vSummary = calloc(1, MAX_LINE_LENGTH);
+        strcpy(visit->vSummary, vSummary);
+    }
+    else
+        visit->vSummary = NULL;
 
     return visit;
 }
 
 
 void push(StackVisits *stack, Visit *visit) {
+    if (stack == NULL) return;
+
     StackNode* new_node = (StackNode *)calloc(1, sizeof(StackNode));
     if (new_node == NULL) {
         return;
@@ -63,7 +70,7 @@ void removeVisit(StackVisits *stack)
     Date date;
     StackVisits auxStack;
     int found = 0;
-
+    memset(&auxStack, 0, sizeof(StackVisits));
     printf ("Please enter the arraival date of the patient, step by step\n");
     getDateFromUser(&date);
     while ((stack->head != NULL) && (found == 0))
@@ -72,7 +79,7 @@ void removeVisit(StackVisits *stack)
         // so we will pop each node, look for the required visit, if it is not we will push the visit to another stack.
         // Once found, we will free it and push back the visits to the patient stack.
         Visit *visit = pop(stack);
-        if (memcmp(&date, &stack->head->visit->tArrival, sizeof(Date)) == 0)
+        if (memcmp(&date, &visit->tArrival, sizeof(Date)) == 0)
         {
             found = 1;
             // if no dismissed date exist, we also need to remove a patient from the doctor who currently treats it
@@ -81,7 +88,8 @@ void removeVisit(StackVisits *stack)
             {
                 visit->Doctor->nPatients--;
             }
-            free(visit->vSummary);
+            if (visit->vSummary != NULL)
+                free(visit->vSummary);
             free(visit);
         }
         else

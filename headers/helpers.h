@@ -13,7 +13,7 @@ void loadDoctors();
 void analyzeDoctorsLine(char buffer[MAX_LINE_LENGTH]);
 
 void loadPatients();
-void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file);
+void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file, Patient **patient);
 
 void loadPatientsLine();
 

@@ -57,26 +57,32 @@ void loadPatients() {
     FILE *patients_file = NULL;
     patients_file = fopen(PATIENTS_TXT_FILE_PATH, "r");
     char buffer[MAX_LINE_LENGTH] = {0};
-
+    Patient *patient = NULL;
     if (patients_file == NULL) {
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
 
-    /* skipping the first line in the file */
+    /* skipping the first 2 line in the file */
+    fgets(buffer, sizeof(buffer), patients_file);
     fgets(buffer, sizeof(buffer), patients_file);
     while (fgets(buffer, sizeof(buffer), patients_file)) {
         buffer[strlen(buffer) - 1] = '\0';
-        if (buffer[0] != '=' && buffer[0] != '\0' && buffer[0] != '\r') {
-            analyzePatientsLine(buffer, patients_file);
+        if (buffer[0] != '\0' && buffer[0] != '\r') {
+            if (buffer[0] =='=')
+            {
+                patient = NULL;
+            }
+            else
+                analyzePatientsLine(buffer, patients_file, &patient);
         }
         memset(buffer, '\0', MAX_LINE_LENGTH);
     }
-
     fclose(patients_file);
 }
 
-void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file) {
+void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file, Patient **patient)
+{
     char copy_of_buffer[MAX_LINE_LENGTH] = {0};
     char *copy_of_buffer_without_number = copy_of_buffer + 2;
     char *token = NULL;
@@ -86,6 +92,7 @@ void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file) {
     char *summary = NULL;
     Doc *assigned_doctor = NULL;
     Date arrival_date, dissmised_date;
+    Visit *visit = NULL;
 
     strcpy(copy_of_buffer, buffer);
 
@@ -100,7 +107,8 @@ void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file) {
         token = strtok(NULL, ";");
         token[strlen(token)] = '\0';
         patient_allergies = extractAllergies(token);
-        patients_tree = insertPatientToTree(patients_tree, createPatient(patient_name, patient_id, patient_allergies, 0));
+        *patient = createPatient(patient_name, patient_id, patient_allergies, 0);
+        patients_tree = insertPatientToTree(patients_tree, *patient);
     } else {
         float duration = 0;
 
@@ -112,9 +120,6 @@ void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file) {
         copy_of_buffer[strlen(copy_of_buffer) - 2] = '\0';
         if (strcmp(copy_of_buffer, "Dismissed:") || strcmp(copy_of_buffer, "Dismissed")) {
             dissmised_date = extractDateFronString(copy_of_buffer);
-            memset(copy_of_buffer, '\0', strlen(copy_of_buffer));
-        } else {
-            dissmised_date = createDate(0, 0, 0, 0, 0);
         }
         memset(copy_of_buffer, '\0', strlen(copy_of_buffer));
 
@@ -124,9 +129,9 @@ void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file) {
             token = strtok(copy_of_buffer, ":");
             token = strtok(NULL, ":");
             if (token != NULL) {
-                duration = (float)atoi(token);
+                duration = (float)atoi(token) * MINUTES_IN_HOUR;
                 token = strtok(NULL, ":");
-                duration += (float)atoi(token) / 100;
+                duration += (float)atoi(token);
             }
         }
         memset(copy_of_buffer, '\0', strlen(copy_of_buffer));
@@ -148,9 +153,14 @@ void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file) {
                 strcpy(summary, token);
                 memset(copy_of_buffer, '\0', strlen(copy_of_buffer));
             } else {
-                summary = "";
+                summary = NULL;
             }
         }
+
+        if (duration == 0)
+            duration = -1;
+        visit = createVisit(arrival_date, dissmised_date, duration, assigned_doctor, summary);
+        push((*patient)->visits, visit);
     }
 }
 
@@ -279,7 +289,7 @@ Date extractDateFronString(char* str) {
 
     tok = strtok(NULL, "/");
     if (tok == NULL) {
-        return createDate(0, 0, 0, 0, 0);
+        return createDate(-1, -1, -1, -1, -1);
     }
     date_information[0] = atoi(tok);
 
@@ -475,7 +485,7 @@ void getUserId(char* str)
     int valid = 0;
     if (str == NULL)
         return;
-    printf("please enter a 9-gitids ID number: \n");
+    printf("please enter a 9-digits ID number: \n");
     while (valid == 0)
     {
         fgets(str, MAX_LINE_LENGTH, stdin);
