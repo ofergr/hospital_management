@@ -9,6 +9,7 @@
 #include "../headers/helpers.h"
 
 
+/* create a visint node to be placed in a visit stack */
 Visit* createVisit(Date tArrival, Date tDismissed, float duration, Doc* doctor, char* vSummary) {
     Visit* visit = (Visit*)calloc(1, sizeof(Visit));
     if (visit == NULL) {
@@ -30,7 +31,7 @@ Visit* createVisit(Date tArrival, Date tDismissed, float duration, Doc* doctor, 
     return visit;
 }
 
-
+/* push a visit to the stack using a wrapper node */
 void push(StackVisits *stack, Visit *visit) {
     if (stack == NULL) return;
 
@@ -44,6 +45,7 @@ void push(StackVisits *stack, Visit *visit) {
     stack->head = new_node;
 }
 
+/* pop a visit from the stack */
 Visit *pop(StackVisits *stack)
 {
     Visit *data;
@@ -60,11 +62,17 @@ Visit *pop(StackVisits *stack)
     return data;
 }
 
+/* peek at the top of the stack for the visit. The node is not popped out */
 Visit* peek(StackVisits *stack)
 {
     return stack->head->visit;
 }
 
+/*
+remove a visit from the stack.
+As we only allowed to push and pop, we will use a temporary stack to pop all the visits, until we find the
+required visit. We then remove it, and push back all the visits then we popped back to the original stack.
+*/
 void removeVisit(StackVisits *stack)
 {
     Date date;

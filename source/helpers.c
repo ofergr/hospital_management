@@ -8,6 +8,7 @@
 #include "../headers/patient.h"
 #include "../headers/helpers.h"
 
+/* function to load the list of doctors from a file */
 void loadDoctors() {
     FILE *doctors_file = NULL;
     int line_count = 0;
@@ -16,7 +17,7 @@ void loadDoctors() {
     char buffer[MAX_LINE_LENGTH] = {0};
 
     if (doctors_file == NULL) {
-        perror("Error opening file");
+        perror("Error opening doctors file");
         exit(EXIT_FAILURE);
     }
 
@@ -32,6 +33,10 @@ void loadDoctors() {
     fclose(doctors_file);
 }
 
+/*
+function to analize aa doctor line from the file
+The expected format is <doctor name>;<license number>;<number of patients>
+*/
 void analyzeDoctorsLine(char buffer[MAX_LINE_LENGTH]) {
     char copy_of_buffer[MAX_LINE_LENGTH] = {0};
     char *token = NULL;
@@ -53,13 +58,14 @@ void analyzeDoctorsLine(char buffer[MAX_LINE_LENGTH]) {
     insertDoctorToList(createDoctor(doctor_name, doctor_license, doctor_patients));
 }
 
+/* fucntion to load patient file */
 void loadPatients() {
     FILE *patients_file = NULL;
     patients_file = fopen(PATIENTS_TXT_FILE_PATH, "r");
     char buffer[MAX_LINE_LENGTH] = {0};
     Patient *patient = NULL;
     if (patients_file == NULL) {
-        perror("Error opening file");
+        perror("Error opening patients file");
         exit(EXIT_FAILURE);
     }
 
@@ -81,6 +87,20 @@ void loadPatients() {
     fclose(patients_file);
 }
 
+/*
+function to analyze line from the patient files
+The expected fromat of a patient entry in the patient file is:
+<index>.<name>;<id>;<list of allergies>
+
+Arrival:<date and time in the format of yyyy/mm/dd hh/mm>
+Dismissed: <date and time in the format of yyyy/mm/dd hh/mm> or empty is still treated
+Duration: <hours>:<minutes> or empty if still treated
+Doctor:<doctor name>
+Summary:<summary of the case in case of dismmisal, or empty>
+....
+....
+details of first visit
+ */
 void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file, Patient **patient)
 {
     char copy_of_buffer[MAX_LINE_LENGTH] = {0};
@@ -164,6 +184,7 @@ void analyzePatientsLine(char buffer[MAX_LINE_LENGTH], FILE *patients_file, Pati
     }
 }
 
+/* function to load the line of patients from a file */
 void loadPatientsLine()
 {
     FILE *patients_line_file = NULL;
@@ -173,7 +194,7 @@ void loadPatientsLine()
     Patient *patient = NULL;
 
     if (patients_line_file == NULL) {
-        perror("Error opening file");
+        perror("Error opening patients line file");
         exit(EXIT_FAILURE);
     }
 
@@ -191,6 +212,7 @@ void loadPatientsLine()
     fclose(patients_line_file);
 }
 
+/* function to extract allergies from the list of patient's allergies, and convert each allergy to its associated bit */
 char extractAllergies(char *allergies)
 {
     char *token = NULL;
@@ -219,6 +241,7 @@ char extractAllergies(char *allergies)
     return allergies_options;
 }
 
+/* function to assign a doctor to a case. The doctor assigned is the one with the least number of active patients */
 Doc* assignDoctor2Case()
 {
     Doc* doctor = findAvailableDoc();
@@ -230,6 +253,7 @@ Doc* assignDoctor2Case()
     return NULL;
 }
 
+/* function to get the list of allergies from a new patient */
 char getAllergiesFromUser() {
     char allergy[MAX_LINE_LENGTH] = { 0 };
     char yesNo[MAX_LINE_LENGTH] = { 0 };
@@ -239,7 +263,7 @@ char getAllergiesFromUser() {
     fgets(yesNo, MAX_LINE_LENGTH, stdin);
     while ((yesNo[0] == 'Y') || (yesNo[0] == 'y'))
     {
-        printf("Please enter allergy name\n");
+        printf("Please enter allergy name (Penicillin / Sulfa / Opioids / Anesthetics / Eggs / Latex / Preservatives):\n");
         fgets(allergy, MAX_LINE_LENGTH, stdin);
         memset(yesNo, 0, MAX_LINE_LENGTH);
         while
@@ -282,11 +306,16 @@ char getAllergiesFromUser() {
     return allergies;
 }
 
+/* Create and populate a Date object from a date string in the format of yyyy/mm/dd hh:mm */
 Date extractDateFronString(char* str) {
     unsigned int date_information[5] = { 0 };
     char* tok = strtok(str, ":");
     int i = 0;
 
+    if (tok == NULL)
+    {
+        return createDate(-1, -1, -1, -1, -1);
+    }
     tok = strtok(NULL, "/");
     if (tok == NULL) {
         return createDate(-1, -1, -1, -1, -1);
@@ -308,6 +337,7 @@ Date extractDateFronString(char* str) {
     return createDate(date_information[2], date_information[1], date_information[0], date_information[3], date_information[4]);
 }
 
+/* function to check if there is a doctor who does not have the maximum allowed patients */
 Doc *isDoctorsAvailable() {
     doctors_list *p = doctors_list_head;
 
@@ -322,6 +352,7 @@ Doc *isDoctorsAvailable() {
     return NULL;
 }
 
+/* returns a doctor that have the least amount of active patients */
 Doc* findAvailableDoc() {
     doctors_list* p = doctors_list_head;
     unsigned int minPatient = MAX_PATIENT_PER_DOC;
@@ -337,6 +368,7 @@ Doc* findAvailableDoc() {
     return availableDoc;
 }
 
+/* function to print the list of patient's allergies */
 void printPatientAllergies(Patient *patient) {
     if (patient->Allergies & NONE) {
         printf(" None");
@@ -372,16 +404,17 @@ void printPatientAllergies(Patient *patient) {
     printf("\n\n\n");
 }
 
+/* get a date from a user input, part after part */
 void getDateFromUser(Date *date) {
     char str[MAX_LINE_LENGTH] = { 0 };
     int valid = 0, num;
-    printf("Please enter year (1900-2200):\n");
+    printf("Please enter year (1900-2024):\n");
     while (!valid)
     {
         fgets(str, MAX_LINE_LENGTH, stdin);
         str[strlen(str) - 1] = '\0';
         num = atoi(str);
-        if ((num < 1900) || (num > 2200) || !isNumber(str))
+        if ((num < 1900) || (num > 2024) || !isNumber(str))
         {
             printf("Invalid year (%s), please enter again\n", str);
         }
@@ -471,6 +504,7 @@ void getDateFromUser(Date *date) {
     return;
 }
 
+/* check if a given string is a number */
 int isNumber(char* str) {
     while (*str) {
         if (*str < '0' || *str > '9')
@@ -480,6 +514,7 @@ int isNumber(char* str) {
     return 1;
 }
 
+/* function to get a patient ID from the user */
 void getUserId(char* str)
 {
     int valid = 0;
@@ -502,7 +537,10 @@ void getUserId(char* str)
     }
 }
 
+/* function to print the menu */
 void printMenu() {
+    printf ("Main Menu:\n");
+    printf("====================================\n");
     printf("0. Exit program\n");
     printf("1. admit patient\n");
     printf("2. check for patients allergies\n");

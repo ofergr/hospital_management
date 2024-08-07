@@ -10,6 +10,10 @@
 
 pInLine *patients_line = NULL;
 
+/*
+function to insert a new patient to the end of the line  The node holds reference to the patiet data which
+is stored in the tree
+*/
 void insertPatientToLine(pInLine **head, Patient *patient) {
     pInLine *newNode = (pInLine*)calloc(1, sizeof(pInLine));
     newNode->lpatient = patient;
@@ -26,9 +30,12 @@ void insertPatientToLine(pInLine **head, Patient *patient) {
     }
 }
 
+/* display the line of patients */
 void displayPatients() {
     pInLine *p = patients_line;
     int i = 1;
+    printf ("Patients in line\n");
+    printf ("================\n");
     while (p != NULL) {
         printf("%d. Name: %s, ID: %s\n", i, p->lpatient->Name, p->lpatient->ID);
         p = p->next;
@@ -37,6 +44,7 @@ void displayPatients() {
     printf("\n");
 }
 
+/* display the line of patients with more data*/
 void displayPatientsInLine()
 {
     pInLine *p = patients_line;
@@ -46,7 +54,7 @@ void displayPatientsInLine()
     {
         printf("%d. Name: %s, ID: %s\n", i, p->lpatient->Name, p->lpatient->ID);
         visit = peek(p->lpatient->visits);
-        printf("addmitted on %d/%d/%d %d:%d\n", visit->tArrival.Day, visit->tArrival.Month,
+        printf("  Addmitted on %d/%d/%d %02d:%02d\n", visit->tArrival.Day, visit->tArrival.Month,
                visit->tArrival.Year, visit->tArrival.Hour,
                visit->tArrival.Min);
         p = p->next;
@@ -55,6 +63,7 @@ void displayPatientsInLine()
     printf("\n");
 }
 
+/* free patient line. Patient details are not freed, as they are only reference here. */
 void freePatientsLine() {
     pInLine *p = patients_line;
     while (p != NULL) {
@@ -70,6 +79,7 @@ void freePatientsLine() {
     patients_line = NULL;
 }
 
+/* removes patient from line based on the patient's ID number. Whenfound, connect its previous node to its next */
 void removePatientFromLine(pInLine** head, const char* patient_id) {
     if (*head == NULL) return;
     pInLine* temp = *head;
@@ -89,6 +99,7 @@ void removePatientFromLine(pInLine** head, const char* patient_id) {
     free(temp);
 }
 
+/* clear line of patients */
 void clearAllPatientsInLine(pInLine** head) {
     pInLine* current = *head;
     pInLine* next;
@@ -100,6 +111,7 @@ void clearAllPatientsInLine(pInLine** head) {
     *head = NULL;
 }
 
+/* save patient's line to file */
 void savePatientLine()
 {
     FILE *patients_line_file = NULL;
@@ -108,7 +120,7 @@ void savePatientLine()
     patients_line_file = fopen(PATIENTS_LINE_TXT_FILE_PATH, "w");
     if (patients_line_file == NULL)
     {
-        perror("Error opening file");
+        perror("Error opening patient file");
         exit(EXIT_FAILURE);
     }
     fprintf(patients_line_file, "Patients' IDs in line\n");

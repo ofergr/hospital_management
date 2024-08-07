@@ -6,6 +6,10 @@
 
 doctors_list *doctors_list_head = NULL;
 
+/*
+Insert a Doctor into the line of doctors, at the end of the linked-list of doctors. Node has
+references to Doctor objects, they do not hold the inforamtion itself.
+*/
 void insertDoctorToList(Doc *doctor) {
     doctors_list *newNode = (doctors_list*)calloc(1, sizeof(doctors_list));
     newNode->ldoctor = doctor;
@@ -22,10 +26,11 @@ void insertDoctorToList(Doc *doctor) {
     }
 }
 
+/* Look for a doctor in the list based on its name */
 Doc *getDoctorByName(const char *name) {
     doctors_list *p = doctors_list_head;
     while (p != NULL) {
-        if (strcmp(p->ldoctor->Name, name) == 0) {
+        if (_stricmp(p->ldoctor->Name, name) == 0) {
             return p->ldoctor;
         }
         p = p->next;
@@ -33,6 +38,7 @@ Doc *getDoctorByName(const char *name) {
     return NULL;
 }
 
+/* function to print all doctors in the list */
 void printDoctorList() {
     doctors_list *p = doctors_list_head;
     int i = 1;
@@ -48,6 +54,7 @@ void printDoctorList() {
     printf("\n");
 }
 
+/* function to free all the doctros from the list. */
 void freeDoctorList() {
     doctors_list *p = doctors_list_head;
     while (p != NULL) {
@@ -55,11 +62,8 @@ void freeDoctorList() {
         if (doctors_list_head->ldoctor->Name != NULL) {
             free(doctors_list_head->ldoctor->Name);
         }
-        /*if (doctors_list_head->ldoctor->nLicense != NULL) {
-            free(doctors_list_head->ldoctor->nLicense);
-        }*/
-        if (doctors_list_head->ldoctor != NULL) {
-            free(doctors_list_head->ldoctor->Name);
+
+        if (doctors_list_head->ldoctor != NULL) {;
             free(doctors_list_head->ldoctor->nLicense);
             free(doctors_list_head->ldoctor);
         }
@@ -71,6 +75,7 @@ void freeDoctorList() {
     doctors_list_head = NULL;
 }
 
+/* Function to save the list of doctors and their details into the doctor file */
 void saveDoctorList()
 {
     FILE *doctors_file = NULL;
@@ -79,7 +84,7 @@ void saveDoctorList()
 
     if (doctors_file == NULL)
     {
-        perror("Error opening file");
+        perror("Error opening doctors file");
         exit(EXIT_FAILURE);
     }
 

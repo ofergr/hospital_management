@@ -28,7 +28,7 @@ void DisplayPatientAddmittions();
 
 void removePatientFromTree(pInTree**, const char*);
 
-void clearAllPatients(pInTree* );
+void clearAllPatients(pInTree** );
 
 void savePatientQueue();
 

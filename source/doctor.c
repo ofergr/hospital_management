@@ -8,6 +8,7 @@
 #include "../headers/patient.h"
 #include "../headers/helpers.h"
 
+/* function to create a doctor object */
 Doc* createDoctor(const char* name, const char* license, const unsigned int patients) {
     Doc* newDoctor = (Doc*)calloc(1, sizeof(Doc));
     if (newDoctor == NULL) {
@@ -21,7 +22,7 @@ Doc* createDoctor(const char* name, const char* license, const unsigned int pati
         return NULL;
     }
     strcpy(newDoctor->Name, name);
-    newDoctor->nLicense = (char*)calloc(strlen(license), sizeof(char));
+    newDoctor->nLicense = (char*)calloc(strlen(license) + 1, sizeof(char));
     if (newDoctor->nLicense == NULL) {
         // Handle memory allocation failure
         free(newDoctor->Name);
@@ -33,6 +34,7 @@ Doc* createDoctor(const char* name, const char* license, const unsigned int pati
     return newDoctor;
 }
 
+/* FUnction to display the doctor's list of patients, with deatils */
 void DispalyDoctorPatients(pInLine *patients_line, char *docName)
 {
     Patient *patient = NULL;
@@ -42,9 +44,10 @@ void DispalyDoctorPatients(pInLine *patients_line, char *docName)
     printf ("Doctor %s patients list:\n", docName);
     printf("====================================\n");
     while (line != NULL) {
+        /* If a patient is currently being treated, it will be the visit on the top of his/her visits stack */
         visit = peek(line->lpatient->visits);
         if (_stricmp(visit->Doctor->Name, docName) == 0) {
-            printf("%d. Name: %s, ID: %s, Addmittiom date %d/%d/%d %d:%d\n", cntr, line->lpatient->Name, line->lpatient->ID,
+            printf("%d. Name: %s, ID: %s, Addmittiom date %d/%d/%d %02d:%02d\n", cntr, line->lpatient->Name, line->lpatient->ID,
                    visit->tArrival.Day, visit->tArrival.Month,
                    visit->tArrival.Year, visit->tArrival.Hour,
                     visit->tArrival.Min);

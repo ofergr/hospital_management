@@ -1,5 +1,6 @@
 #include "../headers/date.h"
 
+/* Function to create a Date object */
 Date createDate(const unsigned int year, const unsigned int month, const unsigned int day, const unsigned int hour,
     const unsigned int minute) {
     Date date;
@@ -11,7 +12,9 @@ Date createDate(const unsigned int year, const unsigned int month, const unsigne
     return date;
 }
 
-// for ease of calculation, we assume 30 days in a month and 365 days in a year
+
+/* Function to convert a Date object to minutes. I returns the total minutes from year 0/0/0 00:00.
+ For ease of calculation, we assume 30 days in a month and 365 days in a year*/
 int convertDateToMinutes(Date* date) {
     int days = 0;
 
@@ -25,6 +28,7 @@ int convertDateToMinutes(Date* date) {
     return (days * 24 * 60) + (date->Hour * 60) + date->Min;
 }
 
+/* Function to calculate the time between two dates, in minutes */
 float calculateDateDiff(Date* earlyDate, Date* laterDate) {
     int earlyMin = convertDateToMinutes(earlyDate);
     int lateMin = convertDateToMinutes(laterDate);

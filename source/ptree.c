@@ -11,6 +11,7 @@
 
 pInTree *patients_tree = NULL;
 
+/* allocation  of patient node */
 pInTree* createTreeNode(Patient *patient) {
     pInTree *newNode = (pInTree*)calloc(1, sizeof(pInTree));
     if (newNode == NULL) {
@@ -23,6 +24,7 @@ pInTree* createTreeNode(Patient *patient) {
     return newNode;
 }
 
+/* insert patient to tree, in a recursive way */
 pInTree *insertPatientToTree(pInTree *root, Patient *patient) {
     if (root == NULL) {
         return createTreeNode(patient);
@@ -39,6 +41,7 @@ pInTree *insertPatientToTree(pInTree *root, Patient *patient) {
     return root;
 }
 
+/* search for patienr in the binary tress based on ID, reccursivly */
 Patient *searchPatient(pInTree *patients_tree, char *id) {
     if (patients_tree == NULL) {
         return NULL;
@@ -52,6 +55,7 @@ Patient *searchPatient(pInTree *patients_tree, char *id) {
     return NULL;
 }
 
+/* display all patiens in the tree, recursivly */
 void displayAllPatients(pInTree *patients_tree) {
     if (patients_tree != NULL) {
         displayAllPatients(patients_tree->left);
@@ -60,6 +64,7 @@ void displayAllPatients(pInTree *patients_tree) {
     }
 }
 
+/* free all patients from the tree, recursivly */
 void freeAllPatients(pInTree *patients_tree) {
     if (patients_tree == NULL) {
         return;
