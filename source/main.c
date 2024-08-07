@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
                 break;
             case DISPLAY_ALL_PATIENTS_IN_LINE:
                 displayPatientsInLine();
-                printf("\n\n");
+                printf("\n");
                 break;
             case ADVANCE_PATIENT_IN_LINE:
                 displayPatients();
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
                 patients_line = advancePatientInLine(patients_line, patient_id);
                 memset(patient_id, '\0', MAX_LINE_LENGTH);
                 displayPatients();
-                printf("\n\n");
+                printf("\n");
             break;
             case DISPLAY_LIST_OF_DOCTORS:
                 printDoctorList();
@@ -133,6 +133,7 @@ int main(int argc, char **argv) {
                 displayPatients();
                 getUserId(patient_id);
                 removePatientFromLine(&patients_line, patient_id);
+                releasePatientDoctor(patient_id);
                 removePatientFromTree(&patients_tree, patient_id);
                 printf("Patient removed successfully.\n");
                 break;

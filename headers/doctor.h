@@ -16,4 +16,5 @@ typedef struct Doc {
 Doc *createDoctor(const char *name, const char *license, const unsigned int patients);
 void DispalyDoctorPatients(pInLine *patients_line, char *docName);
 void decreasePatientCount(const char*);
+void releasePatientDoctor(char *patient_id);
 #endif

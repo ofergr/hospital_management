@@ -47,7 +47,7 @@ void DispalyDoctorPatients(pInLine *patients_line, char *docName)
         /* If a patient is currently being treated, it will be the visit on the top of his/her visits stack */
         visit = peek(line->lpatient->visits);
         if (_stricmp(visit->Doctor->Name, docName) == 0) {
-            printf("%d. Name: %s, ID: %s, Addmittiom date %d/%d/%d %02d:%02d\n", cntr, line->lpatient->Name, line->lpatient->ID,
+            printf("%d. Name: %s, ID: %s, Addmittion date %d/%d/%d %02d:%02d\n", cntr, line->lpatient->Name, line->lpatient->ID,
                    visit->tArrival.Day, visit->tArrival.Month,
                    visit->tArrival.Year, visit->tArrival.Hour,
                     visit->tArrival.Min);
@@ -58,3 +58,20 @@ void DispalyDoctorPatients(pInLine *patients_line, char *docName)
     printf("\n");
 }
 
+/*
+Release a patient from a doctor's care. In case we remove a patient and it has an active visit,
+we need to decrease its doctor's patient count
+*/
+void releasePatientDoctor(char *patient_id)
+{
+  Patient *patient = searchPatient(patients_tree, patient_id);
+  if (patient != NULL) {
+    Visit *visit = peek(patient->visits);
+    if (visit != NULL) {
+        if (visit->tDismissed.Year == -1) {
+            Doc *doctor = visit->Doctor;
+            doctor->nPatients--;
+        }
+    }
+  }
+}

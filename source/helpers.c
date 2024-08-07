@@ -265,38 +265,46 @@ char getAllergiesFromUser() {
     {
         printf("Please enter allergy name (Penicillin / Sulfa / Opioids / Anesthetics / Eggs / Latex / Preservatives):\n");
         fgets(allergy, MAX_LINE_LENGTH, stdin);
+        allergy[strlen(allergy) - 1] = '\0';
         memset(yesNo, 0, MAX_LINE_LENGTH);
-        while
-            (
-                (!strcmp(allergy, "Penicillin")) && (!strcmp(allergy, "Sulfa")) && (!strcmp(allergy, "Opioids")) &&
-                (!strcmp(allergy, "Anesthetics")) && (!strcmp(allergy, "Eggs")) && (!strcmp(allergy, "Latex")) &&
-                (!strcmp(allergy, "Preservatives"))
-                )
+        while (
+            (!_stricmp(allergy, "Penicillin")) && (!_stricmp(allergy, "Sulfa")) && (!_stricmp(allergy, "Opioids")) &&
+            (!_stricmp(allergy, "Anesthetics")) && (!_stricmp(allergy, "Eggs")) && (!_stricmp(allergy, "Latex")) &&
+            (!_stricmp(allergy, "Preservatives")))
         {
             printf("allergy name not exist, please try again\n");
         }
 
-        if (strcmp(allergy, "Penicillin") == 0) {
+        if (_stricmp(allergy, "Penicillin") == 0)
+        {
             allergies |= PENICILLIN;
         }
-        else if (strcmp(allergy, "Sulfa") == 0) {
+        else if (_stricmp(allergy, "Sulfa") == 0)
+        {
             allergies |= SULFA;
         }
-        else if (strcmp(allergy, "Opioids") == 0) {
+        else if (_stricmp(allergy, "Opioids") == 0)
+        {
             allergies |= OPIOIDS;
         }
-        else if (strcmp(allergy, "Anesthetics") == 0) {
+        else if (_stricmp(allergy, "Anesthetics") == 0)
+        {
             allergies |= ANESTHETICS;
         }
-        else if (strcmp(allergy, "Eggs") == 0) {
+        else if (_stricmp(allergy, "Eggs") == 0)
+        {
             allergies |= EGGS;
         }
-        else if (strcmp(allergy, "Latex") == 0) {
+        else if (_stricmp(allergy, "Latex") == 0)
+        {
             allergies |= LATEX;
         }
-        else if (strcmp(allergy, "Preservatives") == 0) {
+        else if (_stricmp(allergy, "Preservatives") == 0)
+        {
             allergies |= PRESERVATIVES;
         }
+        else
+            printf("Allergy does not exist\n");
 
         memset(allergy, 0, MAX_LINE_LENGTH);
         printf("Do you have another allergy?\n");

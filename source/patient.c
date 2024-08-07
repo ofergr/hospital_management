@@ -103,6 +103,11 @@ pInLine *advancePatientInLine(pInLine *head, char *patient_id) {
         prev = curr;
         curr = curr->next;
     }
+    if (curr == head)
+    {
+        printf("Patient id %s is already at the head of the patients list\n", patient_id);
+        return curr;
+    }
     if (curr == NULL) {
         printf("%s\n", ERROR_PATIENT_NOT_FOUND);
         return head;
@@ -130,6 +135,8 @@ void dischargePatient()
     Date destarchedDate;
     Patient *patient = NULL;
     Visit *lastVisit = NULL;
+    float duration = 0;
+    int dismissedDateValid = 0;
 
     getUserId(patient_id);
 
@@ -139,25 +146,41 @@ void dischargePatient()
             if (patients_line == p) {
                 patients_line = p->next;
                 free(p);
-                return;
+                break;
             }
             prev->next = p->next;
             free(p);
-            return;
+            break;
         }
         prev = p;
         p = p->next;
     }
 
-    // get destarch date
-    getDateFromUser(&destarchedDate);
-
     // look for the partient in the tree, and update discharge date and duration of visit
     patient = searchPatient(patients_tree, patient_id);
     if (patient != NULL) {
-        Visit* lastVisit = peek(patient->visits);
+        Visit *lastVisit = peek(patient->visits);
+        // get destarch date
+        while (!dismissedDateValid)
+        {
+            printf("Please enter the destarch date: \n");
+            getDateFromUser(&destarchedDate);
+            duration = calculateDateDiff(&lastVisit->tArrival, &destarchedDate);
+            if (duration < 0)
+            {
+                Date *arravial = &lastVisit->tArrival;
+                printf("Dismissed date should be after arrival date (%02d/%02d/%02d %02d:%02d)\n",
+                       arravial->Day, arravial->Month, arravial->Year,
+                       arravial->Hour, arravial->Min);
+            }
+            else
+            {
+                dismissedDateValid = 1;
+            }
+        }
+
         lastVisit->tDismissed = destarchedDate;
-        lastVisit->Duration = calculateDateDiff(&lastVisit->tArrival, &lastVisit->tDismissed);
+        lastVisit->Duration = duration;
         printf("Please write a visit summary: \n");
         fgets(summary, MAX_LINE_LENGTH, stdin);
         summary[strlen(summary) - 1] = '\0';
@@ -166,6 +189,7 @@ void dischargePatient()
         {
             strcpy(lastVisit->vSummary, summary);
         }
+        lastVisit->Doctor->nPatients--;
         printf("Patient %s has been destarched. Duration of visit %d:%d hours\n\n", patient->Name,
                (int)(lastVisit->Duration) / MINUTES_IN_HOUR, (int)(lastVisit->Duration) % MINUTES_IN_HOUR);
     }
@@ -435,7 +459,7 @@ void savePatientQueue() {
         while (auxStack.head != NULL)
         {
             Visit* visit = pop(&auxStack);
-            fprintf(patients_file, "Arrival:%d/%d/%d %02d:%02d\n", visit->tArrival.Year, visit->tArrival.Month, visit->tArrival.Day,
+            fprintf(patients_file, "Arrival:%d/%d/%d %02d:%02d\n", visit->tArrival.Day, visit->tArrival.Month, visit->tArrival.Year,
                     visit->tArrival.Hour, visit->tArrival.Min);
             if (visit->tDismissed.Year == -1)
             {
@@ -444,7 +468,8 @@ void savePatientQueue() {
             }
             else
             {
-                fprintf(patients_file, "Dismissed:%d/%d/%d %02d:%02d\n", visit->tDismissed.Year, visit->tDismissed.Month, visit->tDismissed.Day,
+                fprintf(patients_file, "Dismissed:%d/%d/%d %02d:%02d\n", visit->tDismissed.Day, visit->tDismissed.Month,
+                 visit->tDismissed.Year,
                     visit->tDismissed.Hour, visit->tDismissed.Min);
                 fprintf(patients_file, "Duration:%02d:%02d\n", (int)(visit->Duration) / MINUTES_IN_HOUR,
                 (int)(visit->Duration) % MINUTES_IN_HOUR);
