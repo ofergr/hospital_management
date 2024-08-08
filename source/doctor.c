@@ -44,6 +44,11 @@ void DispalyDoctorPatients(pInLine *patients_line, char *docName)
     printf ("Doctor %s patients list:\n", docName);
     printf("====================================\n");
     while (line != NULL) {
+        if (isStackEmpty(line->lpatient->visits))
+        {
+            line = line->next;
+            continue;
+        }
         /* If a patient is currently being treated, it will be the visit on the top of his/her visits stack */
         visit = peek(line->lpatient->visits);
         if (_stricmp(visit->Doctor->Name, docName) == 0) {

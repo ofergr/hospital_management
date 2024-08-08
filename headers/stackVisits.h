@@ -24,6 +24,7 @@ Visit *createVisit(Date tArrival, Date tDismissed, float Duration, Doc *Doctor, 
 void push(StackVisits *stack, Visit *visit);
 Visit *pop(StackVisits *stack);
 Visit *peek(StackVisits *stack);
-void removeVisit(StackVisits *stack);
+void removeVisit(Patient *patient);
+int isStackEmpty(StackVisits *stack);
 
 #endif

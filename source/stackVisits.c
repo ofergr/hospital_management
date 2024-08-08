@@ -73,10 +73,11 @@ remove a visit from the stack.
 As we only allowed to push and pop, we will use a temporary stack to pop all the visits, until we find the
 required visit. We then remove it, and push back all the visits then we popped back to the original stack.
 */
-void removeVisit(StackVisits *stack)
+void removeVisit(Patient *patient)
 {
     Date date;
     StackVisits auxStack;
+    StackVisits *stack = patient->visits;
     int found = 0;
     memset(&auxStack, 0, sizeof(StackVisits));
     printf ("Please enter the arraival date of the patient, step by step\n");
@@ -98,6 +99,7 @@ void removeVisit(StackVisits *stack)
             }
             if (visit->vSummary != NULL)
                 free(visit->vSummary);
+            patient->nVisits--;
             free(visit);
         }
         else
@@ -112,4 +114,10 @@ void removeVisit(StackVisits *stack)
         Visit *visit = pop(&auxStack);
         push(stack, visit);
     }
+}
+
+/* Check if the stack is empty */
+int isStackEmpty(StackVisits *stack)
+{
+    return stack->head == NULL;
 }

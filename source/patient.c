@@ -160,10 +160,10 @@ void dischargePatient()
     patient = searchPatient(patients_tree, patient_id);
     if (patient != NULL) {
         Visit *lastVisit = peek(patient->visits);
-        // get destarch date
+        // get discharge date
         while (!dismissedDateValid)
         {
-            printf("Please enter the destarch date: \n");
+            printf("Please enter the discharge date: \n");
             getDateFromUser(&destarchedDate);
             duration = calculateDateDiff(&lastVisit->tArrival, &destarchedDate);
             if (duration < 0)
@@ -213,7 +213,7 @@ void DisplayPatientAddmittions(char *patient_id)
     if (patient != NULL) {
         printf ("Patient addmittions:\n");
         printf ("====================\n");
-        while (patient->visits->head != NULL) {
+        while (!isStackEmpty(patient->visits)) {
             // stack allows us only to pop nodes, not traverse them.
             // so we will pop each node, and push it back to an auxilary stack. Once finish printing all the data,
             // we will push back the nodes to the original stack.
@@ -229,7 +229,7 @@ void DisplayPatientAddmittions(char *patient_id)
             else
             {
                 printf("Dismissed time: \n");
-                printf("Duration: \n ");
+                printf("Duration: \n");
             }
 
             printf("Doctor: %s\n", visit->Doctor->Name);

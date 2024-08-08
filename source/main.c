@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
     char patient_id[MAX_LINE_LENGTH] = {0};
     char doctorName[MAX_LINE_LENGTH] = { 0 };
     Patient *patient = NULL;
+    int valid = 0;
 
     loadDoctors();
     loadPatients();
@@ -89,7 +90,7 @@ int main(int argc, char **argv) {
                 printf("\n");
             break;
             case DISPLAY_ALL_PATIENTS_ASSIGNED_TO_A_DOCTOR:
-                int valid = 0;
+                valid = 0;
                 printDoctorList();
                 while (!valid) {
                     printf("Please enter Doctor's name: \n");
@@ -122,7 +123,7 @@ int main(int argc, char **argv) {
                 if (patient != NULL) {
                     printf("\n");
                     DisplayPatientAddmittions(patient_id);
-                    removeVisit(patient->visits);
+                    removeVisit(patient);
                     DisplayPatientAddmittions(patient_id);
                     printf("\n");
                 } else {
